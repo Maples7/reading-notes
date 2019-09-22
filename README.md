@@ -6,6 +6,7 @@
 
 ### 2019
 
+- [指数基金投资指南](./2019/index-fund-investment.md)
 - [富爸爸穷爸爸](./2019/rich-dad-poor-dad.md)
 - [撒哈拉的故事](./2019/sahara-story.md)
 - [浮生六记](./2019/six-births.md)
