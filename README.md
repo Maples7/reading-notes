@@ -4,6 +4,10 @@
 
 ## 目录
 
+### 2020
+
+- [Elixir in Action](./2020/elixir-in-action.md)
+
 ### 2019
 
 - [指数基金投资指南](./2019/index-fund-investment.md)
