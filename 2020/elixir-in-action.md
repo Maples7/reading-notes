@@ -876,3 +876,179 @@ Generated my_project app
 The compilation goes through all the files from the lib folder and places the resulting .beam files in the ebin folder.
 
 Elixir is a dynamic language. The type of a variable is determined by the value it holds. Data is immutable — it can’t be modified. A function can return the modified version of the input that resides in another memory location. The modified version shares as much memory as possible with the original data. The most important primitive data types are numbers, atoms, and binaries. There is no Boolean type. Instead, the atoms `true` and `false` are used.There is no nullability. The atom `nil` can be used for this purpose. `Range`, keyword lists, `MapSet`, `Date`, `Time`, `NaiveDateTime`, and `DateTime` are abstractions built on top of the existing built-in types.
+
+## 3.1.7 Matching bitstrings and binaries
+
+Recall that a _bitstring_ is a chunk of bits, and a _binary_ is a special case of a bitstring that's always aligned to the byte size.
+
+The following example takes the binary apart by taking its first byte into one variable and the rest of the binary into another:
+
+```sh
+iex(6)> <<b1, rest :: binary>> = binary
+<<1, 2, 3>>
+
+iex(7)> b1
+1
+
+iex(8)> rest
+<<2, 3>>
+```
+
+`rest::binary` states that you expect an arbitrary-sized binary. You can even extract separate bits or groups of bits.
+
+## 3.1.8 Compound matches
+
+An important consequence of this is that match expressions can be chained:
+
+```sh
+iex(3)> a = (b = 1 + 3)
+4
+```
+
+In this (not so useful) example, the following things happen:
+
+1. The expression `1 + 3` is evaluated.
+2. The result (4) is matched against the pattern `b`.
+3. The result of the inner match (which is again 4) is matched against the pattern `a`.
+
+Consequently, both a and b have the value `4`.
+
+Parentheses are optional, and many developers omit them in this case:
+
+```sh
+iex(4)> a = b = 1 + 3
+4
+```
+
+## 3.2.1 Multiclause functions
+
+You can create a function value with the capture operator, `&`: `&Module.fun/arity`. If you capture Geometry.area/1, you capture all of its clauses.
+
+Functions with the same name but different arities are in reality two different functions.
+
+## 3.2.2 Guards
+
+Guards are an extension of the basic pattern-matching mechanism. They allow you to state additional broader expectations that must be satisfied for the entire pattern to match.
+
+If an error is raised from inside the guard, it won’t be propagated, and the guard expression will return `false`. The corresponding clause won’t match, but some other might.
+
+## 3.3.3 The with special form
+
+The `with` special form allows you to use pattern matching to chain multiple expressions, verify that the result of each conforms to the desired pattern, and return the first unexpected result.
+
+In its simplest form, `with` has the following shape:
+
+```elixir
+with pattern_1 <- expression_1,
+     pattern_2 <- expression_2,
+     ...
+do
+  ...
+end
+```
+
+You start from the top, evaluating the first expression and matching the result against the corresponding pattern. If the match succeeds, you move to the next expression. If all the expressions are successfully matched, you end up in the `do` block, and the result of the `with` expression is the result of the last expression in the `do` block.
+
+If any match fails, however, `with` will not proceed to evaluate subsequent expressions. Instead, it will immediately return the result that couldn’t be matched.
+
+## 3.4 Loops and iterations
+
+The principal looping tool in Elixir is recursion.
+
+Although recursion is the basic building block of any kind of looping, most production Elixir code uses it sparingly. That’s because there are many higher-level abstractions that hide the recursion details.
+
+You probably know from other languages that a function call will lead to a stack push, and therefore will consume some memory. A very deep recursion might lead to a stack overflow and crash the entire program. This isn’t necessarily a problem in Elixir, because of the tail-call optimization.
+
+## 3.4.2 Tail function calls
+
+Elixir (or, more precisely, Erlang) treats tail calls in a specific manner by performing a _tail-call optimization_. In this case, calling a function doesn’t result in the usual stack push. Instead, something more like a goto or a jump statement happens. You don’t allocate additional stack space before calling the function, which in turn means the tail function call consumes no additional memory.
+
+Because tail recursion doesn’t consume additional memory, it’s an appropriate solution for arbitrarily large iterations. There is a downside, though. Whereas classical (non-tail) recursion has a more declarative feel to it, tail recursion usually looks more procedural.
+
+```elixir
+defmodule ListHelper do
+  def sum(list) do
+    do_sum(0, list)
+  end
+
+  defp do_sum(current_sum, []) do
+    current_sum
+  end
+
+  defp do_sum(current_sum, [head | tail]) do
+    new_sum = head + current_sum
+    do_sum(new_sum, tail)
+  end
+end
+```
+
+Tail vs. non-tail recursion: Given the properties of tail recursion, you might think it’s always a preferred approach for doing loops. It’s not that simple. Non-tail recursion often looks more elegant and concise, and it can in some circumstances yield better performance. When you write recursion, you should choose the solution that seems like a better fit. If you need to run an infinite loop, tail recursion is the only way that will work. Otherwise, the choice amounts to which looks like a more elegant and performant solution.
+
+Recursion is the basic looping technique, and no loop can be done without it. Still, you won’t need to write explicit recursion all that often. Many typical tasks can be performed by using higher-order functions.
+
+## 3.4.3 Higher-order functions
+
+Under the hood, `Enum.each/2` is powered by recursion: there’s no other way to do loops and iterations in Elixir.
+
+Notice how when capturing the function, you don’t specify the module name. That’s because `add_num/2` resides in the same module, so you can omit the module prefix. In fact, because `add_num/2` is private, you can’t capture it with the module prefix.
+
+## 3.4.4 Comprehensions
+
+The comprehension iterates through each element and runs the `do/end` block. The result is a list that contains all the results returned by the `do/end` block. In this basic form, `for` is no different than `Enum.map/2`.
+
+Comprehensions have various other features that often make them elegant, compared to `Enum`-based iterations. For example, it’s possible to perform nested iterations over multiple collections. The following example takes advantage of this feature to calculate a small multiplication table:
+
+```sh
+iex(2)> for x <- [1, 2, 3], y <- [1, 2, 3], do: {x, y, x*y}
+[
+  {1, 1, 1}, {1, 2, 2}, {1, 3, 3},
+  {2, 1, 2}, {2, 2, 4}, {2, 3, 6},
+  {3, 1, 3}, {3, 2, 6}, {3, 3, 9}
+]
+```
+
+In the examples so far, the result of the comprehension has been a list. But comprehensions can return anything that’s collectable. _Collectable_ is an abstract term for a functional data type that can collect values. Some examples include lists, maps, `MapSet`, and file streams; you can even make your own custom type collectable (more on that in chapter 4).
+
+In more general terms, a comprehension iterates through enumerables, calling the provided block for each value and storing the results in some collectable structure.
+
+Another interesting comprehension feature is that you can specify filters. This gives you the possibility to skip some elements from the input.
+
+The comprehension filter is evaluated for each element of the input enumerable, prior to block execution. If the filter returns `true`, the block is called and the result is collected. Otherwise the comprehension moves on to the next element.
+
+As you can see, comprehensions are an interesting feature, allowing you to do some elegant transformations of the input enumerable. Although this can be done with `Enum` functions, most notably `Enum.reduce/3`, often the resulting code looks more elegant when comprehensions are used. This is particularly true when you have to perform a Cartesian product (cross-join) of multiple enumerables, as was the case with the multiplication table.
+
+## 3.4.5 Streams
+
+Streams are a special kind of enumerable that can be useful for doing lazy composable operations over anything enumerable.
+
+Going back to the example of printing employees, using a stream allows you to print employees in a single go. The change to the original code is simple enough. Instead of using `Enum.with_index/1`, you can rely on its lazy equivalent, `Stream.with_index/1`:
+
+```sh
+iex(7)> employees
+        |> Stream.with_index
+        |> Enum.each(
+          fn {employee, index} ->
+            IO.puts("#{index + 1}. #{employee}")
+          end)
+1. Alice
+2. Bob
+3. John
+```
+
+The output is the same, but the list iteration is done only once. This becomes increasingly useful when you need to compose multiple transformations of the same list.
+
+Even though you stack multiple transformations, everything is performed in a single pass when you call `Enum.each`. In contrast, if you used `Enum` functions everywhere, you’d have to run multiple iterations over each intermediate list, which would incur a performance and memory-usage penalty. This lazy property of streams can become useful for consuming slow and potentially large enumerable input. A typical case is when you need to parse each line of a file. Relying on eager `Enum` functions means you have to read the entire file into memory and then iterate through each line. In contrast, using streams makes it possible to read and immediately parse one line at a time.
+
+```elixir
+def large_lines!(path) do
+  File.stream!(path)
+  |> Stream.map(&String.replace(&1, "\n", ""))
+  |> Enum.filter(&(String.length(&1) > 80))
+end
+```
+
+Here you rely on the `File.stream!/1` function, which takes the path of a file and returns a stream of its lines. Because the result is a stream, the iteration through the file happens only when you request it. After `File.stream!` returns, no byte from the file has been read yet. Then you remove the trailing newline character from each line, again in the lazy manner. Finally, you eagerly take only long lines, using `Enum.filter/2`. It’s at this point that iteration happens. The consequence is that you never read the entire file in memory; instead, you work on each line individually.
+
+There are no special tricks in the Elixir compiler that allow these lazy enumerations. The real implementation is fairly involved, but the basic idea behind streams is simple and relies on anonymous functions. In a nutshell, to make a lazy computation, you need to return a lambda that performs the computation. This makes the computation lazy, because you return its description rather than its result. When the computation needs to be materialized, the consumer code can call the lambda.
+
+Recursion is the main tool for implementing loops. Tail recursion is used when you need to run an arbitrarily long loop.
