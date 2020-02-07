@@ -1052,3 +1052,65 @@ Here you rely on the `File.stream!/1` function, which takes the path of a file a
 There are no special tricks in the Elixir compiler that allow these lazy enumerations. The real implementation is fairly involved, but the basic idea behind streams is simple and relies on anonymous functions. In a nutshell, to make a lazy computation, you need to return a lambda that performs the computation. This makes the computation lazy, because you return its description rather than its result. When the computation needs to be materialized, the consumer code can call the lambda.
 
 Recursion is the main tool for implementing loops. Tail recursion is used when you need to run an arbitrarily long loop.
+
+## 4: Data abstractions
+
+Being a functional language, Elixir promotes decoupling of data from the code. Instead of classes, you use modules, which are collections of functions.
+
+The basic principles of data abstraction in Elixir can be summarized as follows:
+
+- A module is in charge of abstracting some data.
+- The module’s functions usually expect an instance of the data abstraction as the first argument.
+- Modifier functions return a modified version of the abstraction.
+- Query functions return some other type of data.
+
+```elixir
+defmodule TodoList do
+  def new(), do: MultiDict.new()
+
+  def add_entry(todo_list, date, title) do
+    MultiDict.add(todo_list, date, title)
+  end
+
+  def entries(todo_list, date) do
+    MultiDict.get(todo_list, date)
+  end
+end
+```
+
+This is a classical separation of concerns, where you extract a distinct responsibility into a separate abstraction, and then create another abstraction on top of it. A distinct `MultiDict` abstraction is now readily available to be used in other places in code if needed. Furthermore, you can extend `TodoList` with additional functions that don’t belong to `MultiDict`. For example, `due_today/2` would return all entries for today.
+
+## 4.1.4 Abstracting with structs
+
+A struct may exist only in a module, and a single module can define only one struct. Underneath, a struct instance is a special kind of map. Therefore, individual fields are accessed just like maps:
+
+```sh
+iex(2)> one_half.a
+1
+
+iex(3)> one_half.b
+2
+```
+
+The nice thing about structs is that you can pattern-match on them:
+
+```sh
+iex(4)> %Fraction{a: a, b: b} = one_half
+%Fraction{a: 1, b: 2}
+
+iex(5)> a
+1
+
+iex(6)> b
+2
+```
+
+This makes it possible to assert that some variable is really a struct:
+
+```sh
+iex(6)> %Fraction{} = one_half
+%Fraction{a: 1, b: 2}
+
+iex(7)> %Fraction{} = %{a: 1, b: 2}
+** (MatchError) no match of right hand side value: %{a: 1, b: 2}
+```
