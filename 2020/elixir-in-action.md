@@ -1392,8 +1392,7 @@ def init(params) do
 end
 ```
 
-It’s worth repeating that the synchronous call won’t block indefinitely. Recall that `GenServer.call`
-has a default timeout of five seconds, and you can configure it to be less for better responsiveness. Still, when a request times out, it isn’t removed from the receiver’s mailbox. A request is a message that’s placed in the receiver’s mailbox. A timeout means you give up waiting on the response, but the message remains in the receiver’s mailbox and will be processed at some point.
+It’s worth repeating that the synchronous call won’t block indefinitely. Recall that `GenServer.call` has a default timeout of five seconds, and you can configure it to be less for better responsiveness. Still, when a request times out, it isn’t removed from the receiver’s mailbox. A request is a message that’s placed in the receiver’s mailbox. A timeout means you give up waiting on the response, but the message remains in the receiver’s mailbox and will be processed at some point.
 
 ## 7.3.4 Addressing the process bottleneck
 
@@ -1698,7 +1697,7 @@ Note that lookups are local. When a registration is being performed, all nodes a
 
 Take a look at the shape of this pid: `#PID<7954.90.0>`. The first number in the pid string representation isn’t 0: this indicates that you’re dealing with a process from some other node.
 
-All the pids you’ve seen up to now have had a similar form: `<0.X.0>`, where `X` is a positive integer. Internally, each process has a node-wide unique identifier. This identifier can be seen in the last two numbers of the string representation. If you create enough processes on a single node, the third number will also be greater than zero. The first number represents the node number — an internal identifier of the node where the process is running. When this number is zero, the process is from the local node. Conversely, when the output includes a pid in the form `<X.Y.Z>` and `X` isn’t zero, you can be sure it’s a remote process. To programmatically determine the node where a process is running, you can use `Kernel.node/1` (https://hexdocs.pm/elixir/Kernel.html# node/1).
+All the pids you’ve seen up to now have had a similar form: `<0.X.0>`, where `X` is a positive integer. Internally, each process has a node-wide unique identifier. This identifier can be seen in the last two numbers of the string representation. If you create enough processes on a single node, the third number will also be greater than zero. The first number represents the node number — an internal identifier of the node where the process is running. When this number is zero, the process is from the local node. Conversely, when the output includes a pid in the form `<X.Y.Z>` and `X` isn’t zero, you can be sure it’s a remote process. To programmatically determine the node where a process is running, you can use `Kernel.node/1` (https://hexdocs.pm/elixir/Kernel.html#node/1).
 
 Another frequent discovery pattern occurs when you want to register multiple processes under the same alias. This may sound strange, but it’s useful in situations where you want to categorize processes in a cluster and broadcast messages to all processes in a category. For this particular problem, you can use the strangely named `:pg2` (process groups, version 2) module (http://erlang.org/doc/man/pg2.html). This module allows you to create arbitrarily named cluster-wide groups and add multiple processes to those groups. This addition is propagated across all nodes, and later you can query the group and get the list of all processes belonging to it.
 
