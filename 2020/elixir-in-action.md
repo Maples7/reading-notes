@@ -1143,7 +1143,7 @@ You should always be aware that structs are in reality just maps, so they have t
 iex(1)> one_half = Fraction.new(1, 2)
 
 iex(2)> Enum.to_list(one_half)
-\*\* (Protocol.UndefinedError) protocol Enumerable not implemented for %Fraction{a: 1, b: 2}
+** (Protocol.UndefinedError) protocol Enumerable not implemented for %Fraction{a: 1, b: 2}
 ```
 
 Remember, a struct is a functional abstraction and should therefore behave according to the implementation of the module where it’s defined. In the case of the `Fraction` abstraction, you must define whether `Fraction` is enumerable and, if so, in what way. If this isn’t done, `Fraction` isn’t an enumerable, so you can’t call `Enum` functions on it.
