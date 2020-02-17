@@ -1053,7 +1053,7 @@ There are no special tricks in the Elixir compiler that allow these lazy enumera
 
 Recursion is the main tool for implementing loops. Tail recursion is used when you need to run an arbitrarily long loop.
 
-## 4: Data abstractions
+## 4 Data abstractions
 
 Being a functional language, Elixir promotes decoupling of data from the code. Instead of classes, you use modules, which are collections of functions.
 
