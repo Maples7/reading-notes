@@ -1661,7 +1661,7 @@ The function `Mix.env/0` is not available at runtime, so you shouldn’t invoke 
 
 You should keep in mind that scripts such as config.exs, or environment-specific ones like dev.exs, are evaluated before the project is compiled and started. This means you’re limited in what you can do in such scripts. Even though the scripts are regular Elixir code, you can only invoke functions from the Elixir standard library and `mix` helper functions (such as `Mix.env/0`). You can’t invoke functions from your own modules, nor any code from your dependencies. That’s because these modules aren’t yet available when the config scripts are being evaluated.
 
-## 12: Building a distributed system
+## 12 Building a distributed system
 
 Much like remote components, processes live their own lives and run in total isolation from each other. Issuing a request to another local process can be considered a remote call, and message-passing has much in common with remote network communication.
 
