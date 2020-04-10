@@ -6,6 +6,7 @@
 
 ### 2020
 
+- [The Python Tutorial](./2020/python-tutorial.md)
 - [Elixir in Action](./2020/elixir-in-action.md)
 
 ### 2019
