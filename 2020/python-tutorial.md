@@ -2,6 +2,12 @@
 
 https://docs.python.org/3/tutorial/
 
+## 4.6. Defining Functions
+
+The _execution_ of a function introduces a new symbol table used for the local variables of the function. More precisely, all variable assignments in a function store the value in the local symbol table; whereas variable references first look in the local symbol table, then in the local symbol tables of enclosing functions, then in the global symbol table, and finally in the table of built-in names. Thus, global variables and variables of enclosing functions cannot be directly assigned a value within a function (unless, for global variables, named in a `global` statement, or, for variables of enclosing functions, named in a `nonlocal` statement), although they may be referenced.
+
+The actual parameters (arguments) to a function call are introduced in the local symbol table of the called function when it is called; thus, arguments are passed using _call by value_ (where the _value_ is always an object _reference_, not the value of the object)(NOTE: Actually, _call by object reference_ would be a better description, since if a mutable object is passed, the caller will see any changes the callee makes to it (items inserted into a list).). When a function calls another function, a new local symbol table is created for that call.
+
 ## 4.7.3. Special parameters
 
 By default, arguments may be passed to a Python function either by position or explicitly by keyword. For readability and performance, it makes sense to restrict the way arguments can be passed so that a developer need only look at the function definition to determine if items are passed by position, by position or keyword, or by keyword.
