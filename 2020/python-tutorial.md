@@ -307,3 +307,49 @@ The value of x is 32.5, and y is 40000...
 Formatted string literals (also called f-strings for short) let you include the value of Python expressions inside a string by prefixing the string with `f` or `F` and writing expressions as `{expression}`.
 
 An optional format specifier can follow the expression. This allows greater control over how the value is formatted. The following example rounds pi to three places after the decimal:
+
+```sh
+>>> import math
+>>> print(f'The value of pi is approximately {math.pi:.3f}.')
+The value of pi is approximately 3.142.
+```
+
+Passing an integer after the `':'` will cause that field to be a minimum number of characters wide. This is useful for making columns line up.
+
+```sh
+>>> table = {'Sjoerd': 4127, 'Jack': 4098, 'Dcab': 7678}
+>>> for name, phone in table.items():
+...     print(f'{name:10} ==> {phone:10d}')
+...
+Sjoerd     ==>       4127
+Jack       ==>       4098
+Dcab       ==>       7678
+```
+
+Other modifiers can be used to convert the value before it is formatted. `'!a'` applies `ascii()`, `'!s'` applies `str()`, and `'!r'` applies `repr()`:
+
+```sh
+>>> animals = 'eels'
+>>> print(f'My hovercraft is full of {animals}.')
+My hovercraft is full of eels.
+>>> print(f'My hovercraft is full of {animals!r}.')
+My hovercraft is full of 'eels'.
+```
+
+## 7.2. Reading and Writing Files
+
+In text mode, the default when reading is to convert platform-specific line endings (`\n` on Unix, `\r\n` on Windows) to just `\n`. When writing in text mode, the default is to convert occurrences of `\n` back to platform-specific line endings. This behind-the-scenes modification to file data is fine for text files, but will corrupt binary data like that in `JPEG` or `EXE` files. Be very careful to use binary mode when reading and writing such files.
+
+## 7.2.1. Methods of File Objects
+
+For reading lines from a file, you can loop over the file object. This is memory efficient, fast, and leads to simple code:
+
+```sh
+>>> for line in f:
+...     print(line, end='') # there is a `\n` at the end of each line
+...
+This is the first line of the file.
+Second line of the file
+```
+
+If you want to read all the lines of a file in a list you can also use `list(f)` or `f.readlines()`.
