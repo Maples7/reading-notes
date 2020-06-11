@@ -6,6 +6,7 @@
 
 ### 2020
 
+- [刷新：重新发现商业与未来](./2020/hit-refresh.md)
 - [The Python Tutorial](./2020/python-tutorial.md)
 - [扶桑](./2020/fu-sang.md)
 - [Elixir in Action](./2020/elixir-in-action.md)
